@@ -5,7 +5,7 @@ android {
         applicationId "com.pain2gradle.myapplication"
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
-        versionCode getTagNumber()
+        versionCode getCommitNumber()
         versionName getTagName()
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         //设置产品通道要先在这里声明
