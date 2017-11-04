@@ -7,26 +7,59 @@ android {
         targetSdkVersion rootProject.targetSdkVersion
         versionCode getCommitNumber()
         versionName getTagName()
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         //设置产品通道要先在这里声明
         flavorDimensions "channelfeature"
+        /**
+         * 测试相关
+         * 1.测试时的Runner
+         * 2.测试生成的apk包名
+         * 3.是否启用性能分析
+         * 4.是否启用功能调试
+         */
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testApplicationId  "com.pain2gradle.testapp"
+        testHandleProfiling true
+        testFunctionalTest true
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField "Integer","TYPENUMBER","4396"
+        }
+        debug{
+            buildConfigField "Integer","TYPENUMBER","9527"
         }
     }
     productFlavors{
         channelpain{
             dimension "channelfeature"
             manifestPlaceholders.put("CHANNEL","channel1")
+            buildConfigField("String","TESTURL","\"httppain\"")
+            buildConfigField "String","TESTNAME","\"pain\""
+            buildConfigField "Integer","TESTNUMBER","123"
+            resValue('string','channelname',"pain渠道")
         }
         channelsky{
             dimension "channelfeature"
             manifestPlaceholders.put("CHANNEL","channel2")
+            buildConfigField("String","TESTURL","\"httpsky\"")
+            buildConfigField "String","TESTNAME","\"sky\""
+            buildConfigField "Integer","TESTNUMBER","456"
+            resValue('string','channelname',"sky渠道")
         }
     }
+    //一个配置生成apk的名字的方法
+    android.applicationVariants.all { variant->
+            variant.outputs.all {
+                // 直接改名字，给闭包当中的字段赋值
+                outputFileName= "app_" + productFlavors[0].name + "_" + buildType.name  + defaultConfig.versionName + ".apk";
+                    //output ->output.outputFile=new File(output.outputFile.parent,"Gradle测试_"+productFlavors[0].name+buildType.name+defaultConfig.versionName+".apk")
+            }
+    }
+    //渠道多的时候用这个方法配置。注意一般配置一下同时的东西比如每个渠道名
+    productFlavors.all{flavor->
+        manifestPlaceholders.put("NAMEEACH",name) }
 }
 
 dependencies {
@@ -42,7 +75,7 @@ def getTagName(){
     //执行命令行 用，隔开
     exec {
         commandLine 'git','describe','--abbrev=0','--tags'
-        //这是在闭包 内部传值到外界的一个方法（ps；和java赋值是相反的 ？）
+        //这是在闭包内部传值到外界的一个方法（ps；和java赋值是相反的 ？）
         standardOutput=stdout
     }
     //过滤字符就好，比如空格换行之类的
@@ -57,6 +90,7 @@ def getTagNumber(){
     }
     return  stdout.toString().split('\n').size()
 }
+//同上，每一个commit就会在VersionCode+1
 def getCommitNumber(){
     def cmd = 'git rev-list HEAD --first-parent --count'
     return cmd.execute().text.trim().toInteger()

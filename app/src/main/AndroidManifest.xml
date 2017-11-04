@@ -9,6 +9,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <meta-data android:value="${CHANNEL}" android:name="CHANNEL"/>
+        <meta-data android:value="${NAMEEACH}" android:name="NAMEEACH"/>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
